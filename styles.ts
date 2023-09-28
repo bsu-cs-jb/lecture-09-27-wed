@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     alignContent: "flex-start",
   },
   bigButtonUnpressed: {
-    backgroundColor: "#33C9FF",
+    backgroundColor: "#87C9CC",
     borderRadius: 8,
     padding: 6,
   },

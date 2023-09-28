@@ -122,7 +122,7 @@ export default function App() {
       (bagItem) => bagItem.id == item.id,
     );
     const updatedBag = { items: [...bag.items] };
-    updatedBag.items[bagItemIndex].quantity += 1;
+    updatedBag.items[bagItemIndex].quantity -= 1;
     if (updatedBag.items[bagItemIndex].quantity <= 0) {
       updatedBag.items.splice(bagItemIndex, 1);
     }
@@ -143,7 +143,7 @@ export default function App() {
       <View style={styles.container}>
         <TitleText>Wed 9/27</TitleText>
         <MenuView menu={menu} onAddToBag={handleAddItem} />
-        <View style={{ flex: 0.2 }} />
+        <View style={{ height: 20 }} />
         <BagView
           bag={bag}
           menu={menu}

@@ -36,7 +36,9 @@ export default function BagView({
               title="-"
               onPress={() => onDecrement(item)}
             />
-            <LabelText>{item.quantity}</LabelText>
+            <LabelText style={{ width: 42 }}>
+              {item.quantity}
+            </LabelText>
             <BigButton
               style={styles.quantityButton}
               title="+"
