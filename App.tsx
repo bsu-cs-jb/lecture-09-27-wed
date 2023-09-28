@@ -1,30 +1,10 @@
 import * as React from "react";
-import {
-  Button,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { SafeAreaView, View } from "react-native";
 import styles from "./styles";
-import {
-  BigButton,
-  FlexFill,
-  LabelText,
-  LctView,
-  TitleText,
-} from "./Shared";
+import { TitleText } from "./Shared";
 import MenuView from "./MenuView";
 import BagView from "./BagView";
-
-let lastId = 0;
-function genid() {
-  const randInt = Math.random() * 10 ** 15;
-  const perfNowInt = (performance.now() % 10 ** 5) * 10 ** 10;
-  const p = (randInt + perfNowInt + lastId++).toFixed().toString();
-
-  return `id-${p}`;
-}
+import { genid } from "./utils";
 
 /**
  * Food ordering
@@ -40,44 +20,55 @@ function genid() {
  * - calorie counts
  */
 
-const MENU = [
-  {
-    id: genid(),
-    name: "Cheeseburger",
-    description: "The best Cheeseburger ever made.",
-    calories: 870,
-    price: 6.99,
-    labels: ["meatie"],
-    allergens: ["wheat", "eggs"],
-  },
-  {
-    id: genid(),
-    name: "Fries",
-    description: "'Freedom' fries",
-    calories: 230,
-    price: 2.99,
-    labels: ["vegetarian"],
-    allergens: ["gluten", "peanuts"],
-  },
-  {
-    id: genid(),
-    name: "Donuts",
-    description: "Dunkin'",
-    calories: 430,
-    price: 3.99,
-    labels: ["vegetarian"],
-    allergens: ["wheat", "peanuts"],
-  },
-  {
-    id: genid(),
-    name: "Soda",
-    description: "More calories than anyone needs",
-    calories: 250,
-    price: 2.99,
-    labels: ["vegetarian", "vegan"],
-    allergens: [],
-  },
-];
+const MENU = {
+  items: [
+    {
+      id: genid(),
+      name: "Cheeseburger",
+      description: "The best Cheeseburger ever made.",
+      calories: 870,
+      price: 6.99,
+      labels: [],
+      allergens: ["wheat", "eggs"],
+    },
+    {
+      id: genid(),
+      name: "Hamburger",
+      description: "A hamburger",
+      calories: 770,
+      price: 5.99,
+      labels: [],
+      allergens: ["wheat", "eggs"],
+    },
+    {
+      id: genid(),
+      name: "Fries",
+      description: "'Freedom' fries",
+      calories: 230,
+      price: 2.99,
+      labels: ["vegetarian"],
+      allergens: ["gluten", "peanuts"],
+    },
+    {
+      id: genid(),
+      name: "Donuts",
+      description: "Dunkin'",
+      calories: 430,
+      price: 3.99,
+      labels: ["vegetarian"],
+      allergens: ["wheat", "peanuts"],
+    },
+    {
+      id: genid(),
+      name: "Soda",
+      description: "More calories than anyone needs",
+      calories: 250,
+      price: 2.99,
+      labels: ["vegetarian", "vegan"],
+      allergens: [],
+    },
+  ],
+};
 
 function findFoodItemIndex(
   foodItemId: string,
@@ -88,28 +79,33 @@ function findFoodItemIndex(
   );
 }
 
-function addFoodToBag(food: FoodItem, bag: BagItem[]) {
-  const foodItemIndex = findFoodItemIndex(food.id, bag);
+function addFoodToBag(food: FoodItem, bag: Bag): Bag {
+  const foodItemIndex = findFoodItemIndex(food.id, bag.items);
   if (foodItemIndex == -1) {
-    return [
-      ...bag,
-      {
-        id: genid(),
-        foodItemId: food.id,
-        name: food.name,
-        quantity: 1,
-      },
-    ];
+    return {
+      items: [
+        ...bag.items,
+        {
+          id: genid(),
+          foodItemId: food.id,
+          name: food.name,
+          unitPrice: food.price,
+          quantity: 1,
+        },
+      ],
+    };
   } else {
-    const updatedBag = [...bag];
-    updatedBag[foodItemIndex].quantity += 1;
-    return updatedBag;
+    const updatedBagItems = [...bag.items];
+    updatedBagItems[foodItemIndex].quantity += 1;
+    return {
+      items: updatedBagItems,
+    };
   }
 }
 
 export default function App() {
-  const [menu, setMenu] = React.useState<FoodItem[]>([]);
-  const [bag, setBag] = React.useState<BagItem[]>([]);
+  const [menu, setMenu] = React.useState<Menu>({ items: [] });
+  const [bag, setBag] = React.useState<Bag>({ items: [] });
 
   React.useEffect(() => {
     // fetch menu from server
@@ -122,23 +118,23 @@ export default function App() {
   };
 
   const handleDecrementBagItem = (item: BagItem) => {
-    const bagItemIndex = bag.findIndex(
+    const bagItemIndex = bag.items.findIndex(
       (bagItem) => bagItem.id == item.id,
     );
-    const updatedBag = [...bag];
-    updatedBag[bagItemIndex].quantity -= 1;
-    if (updatedBag[bagItemIndex].quantity <= 0) {
-      updatedBag.splice(bagItemIndex, 1);
+    const updatedBag = { items: [...bag.items] };
+    updatedBag.items[bagItemIndex].quantity += 1;
+    if (updatedBag.items[bagItemIndex].quantity <= 0) {
+      updatedBag.items.splice(bagItemIndex, 1);
     }
     setBag(updatedBag);
   };
 
   const handleIncrementBagItem = (item: BagItem) => {
-    const bagItemIndex = bag.findIndex(
+    const bagItemIndex = bag.items.findIndex(
       (bagItem) => bagItem.id == item.id,
     );
-    const updatedBag = [...bag];
-    updatedBag[bagItemIndex].quantity += 1;
+    const updatedBag = { items: [...bag.items] };
+    updatedBag.items[bagItemIndex].quantity += 1;
     setBag(updatedBag);
   };
 
@@ -150,6 +146,7 @@ export default function App() {
         <View style={{ flex: 0.2 }} />
         <BagView
           bag={bag}
+          menu={menu}
           onDecrement={handleDecrementBagItem}
           onIncrement={handleIncrementBagItem}
         />

@@ -3,14 +3,20 @@ import { ScrollView, View } from "react-native";
 import styles from "./styles";
 import { BigButton, FlexFill, LabelText, TitleText } from "./Shared";
 
+function findMenuItem(foodItemId: string, menu: Menu) {
+  return menu.items.find((item) => item.id == foodItemId);
+}
+
 interface BagViewProps {
-  bag: BagItem[];
+  menu: Menu;
+  bag: Bag;
   onIncrement: (item: BagItem) => void;
   onDecrement: (item: BagItem) => void;
 }
 
 export default function BagView({
   bag,
+  menu,
   onIncrement,
   onDecrement,
 }: BagViewProps) {
@@ -21,7 +27,7 @@ export default function BagView({
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}
       >
-        {bag.map((item) => (
+        {bag.items.map((item) => (
           <View key={item.id} style={styles.bagItemView}>
             <LabelText>{item.name}</LabelText>
             <FlexFill />
@@ -39,6 +45,28 @@ export default function BagView({
           </View>
         ))}
       </ScrollView>
+      <LabelText>
+        Calories:{" "}
+        {bag.items
+          .reduce(
+            (total: number, item: BagItem) =>
+              total +
+              (findMenuItem(item.foodItemId, menu)?.calories || 0) *
+                item.quantity,
+            0,
+          )
+          .toLocaleString()}
+      </LabelText>
+      <LabelText>
+        Total: $
+        {bag.items
+          .reduce(
+            (total: number, item: BagItem) =>
+              total + item.unitPrice * item.quantity,
+            0,
+          )
+          .toFixed(2)}
+      </LabelText>
     </View>
   );
 }

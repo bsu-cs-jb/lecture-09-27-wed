@@ -45,9 +45,9 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     width: "100%",
+    borderWidth: 1,
   },
   scrollViewContent: {
-    flex: 1,
     gap: 10,
     width: "100%",
   },

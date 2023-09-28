@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-  Button,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Button, ScrollView, Text, View } from "react-native";
 import styles from "./styles";
 import {
   BigButton,
@@ -30,7 +24,7 @@ function MenuItemView({ item, onPress }: MenuItemViewProps) {
 }
 
 interface MenuViewProps {
-  menu: FoodItem[];
+  menu: Menu;
   onAddToBag: (item: FoodItem) => void;
 }
 
@@ -49,7 +43,7 @@ export default function MenuView({
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}
       >
-        {menu.map((item) => (
+        {menu.items.map((item) => (
           <View key={item.id} style={styles.menuHorzView}>
             <View style={styles.menuItemDetails}>
               <LabelText>{item.name}</LabelText>

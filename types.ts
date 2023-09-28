@@ -1,3 +1,6 @@
+interface Menu {
+  items: FoodItem[];
+}
 interface FoodItem {
   id: string;
   name: string;
@@ -8,9 +11,13 @@ interface FoodItem {
   allergens: string[];
 }
 
+interface Bag {
+  items: BagItem[];
+}
 interface BagItem {
   id: string;
   foodItemId: string;
   name: string;
+  unitPrice: number;
   quantity: number;
 }
